@@ -1,185 +1,126 @@
-# Explainer for the TODO API
+# Explainer for the Selective Permissions Intervention
 
-**Instructions for the explainer author: Search for "todo" in this repository and update all the
-instances as appropriate. For the instances in `index.bs`, update the repository name, but you can
-leave the rest until you start the specification. Then delete the TODOs and this block of text.**
-
-This proposal is an early design sketch by [TODO: team] to describe the problem below and solicit
+This proposal is an early design sketch to describe the problem below and solicit
 feedback on the proposed solution. It has not been approved to ship in Chrome.
 
-TODO: Fill in the whole explainer template below using https://tag.w3.org/explainers/ as a
-reference. Look for [brackets].
-
-## Proponents
-
-- [Proponent team 1]
-- [Proponent team 2]
-- [etc.]
-
 ## Participate
-- https://github.com/explainers-by-googlers/[your-repository-name]/issues
-- [Discussion forum]
+- https://github.com/explainers-by-googlers/selective-permissions-intervention/issues
 
-## Table of Contents [if the explainer is longer than one printed page]
 
-<!-- Update this table of contents by running `npx doctoc README.md` -->
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+### Motivation 🤔
 
-- [Introduction](#introduction)
-- [Goals](#goals)
-- [Non-goals](#non-goals)
-- [User research](#user-research)
-- [Use cases](#use-cases)
-  - [Use case 1](#use-case-1)
-  - [Use case 2](#use-case-2)
-- [[Potential Solution]](#potential-solution)
-  - [How this solution would solve the use cases](#how-this-solution-would-solve-the-use-cases)
-    - [Use case 1](#use-case-1-1)
-    - [Use case 2](#use-case-2-1)
-- [Detailed design discussion](#detailed-design-discussion)
-  - [[Tricky design choice #1]](#tricky-design-choice-1)
-  - [[Tricky design choice 2]](#tricky-design-choice-2)
-- [Considered alternatives](#considered-alternatives)
-  - [[Alternative 1]](#alternative-1)
-  - [[Alternative 2]](#alternative-2)
-- [Security and Privacy Considerations](#security-and-privacy-considerations)
-- [Stakeholder Feedback / Opposition](#stakeholder-feedback--opposition)
-- [References & acknowledgements](#references--acknowledgements)
+When a user grants a website permission to access a powerful API like their precise geolocation, microphone, camera, screen, or clipboard contents, their consent is intended for the site, not necessarily to every third-party script running on the page. In particular, embedded ad scripts can currently leverage the page's permission to opportunistically access this sensitive data. The user may not be aware that an advertisement is accessing their information.
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+This intervention aims to better align a granted permission with user intent by preventing ad script in a context with API permission from using it, reinforcing user trust and control over their data.
 
-## Introduction
 
-[The "executive summary" or "abstract".
-Explain in a few sentences what the goals of the project are,
-and a brief overview of how the solution works.
-This should be no more than 1-2 paragraphs.]
+---
 
-## Goals
 
-[What is the **end-user need** which this project aims to address? Make this section short, and
-elaborate in the Use cases section.]
+### The Intervention 🛡️
 
-## Non-goals
+This intervention will cause the Permissions Policy checks for the given APIs to be denied when the browser determines that an “ad script” attempted to call the API.
 
-[If there are "adjacent" goals which may appear to be in scope but aren't,
-enumerate them here. This section may be fleshed out as your design progresses and you encounter necessary technical and other trade-offs.]
 
-## User research
+#### Ad Classification
 
-[If any user research has been conducted to inform your design choices,
-discuss the process and findings. User research should be more common than it is.]
+The classification of ads is left to the discretion of the user agent. For example, Chrome detects ads using its [AdTagging](https://chromium.googlesource.com/chromium/src/+/master/docs/ad_tagging.md) feature.
 
-## Use cases
 
-[Describe in detail what problems end-users are facing, which this project is trying to solve. A
-common mistake in this section is to take a web developer's or server operator's perspective, which
-makes reviewers worry that the proposal will violate [RFC 8890, The Internet is for End
-Users](https://www.rfc-editor.org/rfc/rfc8890).]
+#### Protected APIs
 
-### Use case 1
+This intent is to block access to APIs that reveal personal information about the user, as opposed to information about their browsing device. This is not an anti-fingerprinting intervention. As such, the initial features considered for this intervention are:
 
-### Use case 2
+* Geolocation
+* Bluetooth
+* Microphone
+* Camera
+* Clipboard
+* Display Capture
+* USB
 
-<!-- In your initial explainer, you shouldn't be attached or appear attached to any of the potential
-solutions you describe below this. -->
 
-## [Potential Solution]
+#### Actions Taken
 
-[For each related element of the proposed solution - be it an additional JS method, a new object, a new element, a new concept etc., create a section which briefly describes it.]
+When the intervention is triggered, Chrome will perform the following three actions simultaneously:
 
-```js
-// Provide example code - not IDL - demonstrating the design of the feature.
 
-// If this API can be used on its own to address a user need,
-// link it back to one of the scenarios in the goals section.
 
-// If you need to show how to get the feature set up
-// (initialized, or using permissions, etc.), include that too.
+1. **Deny Permission**: The API request will be automatically denied. For promise-based APIs, the promise will be rejected with a `DOMException` named `'NotAllowedError'`, mimicking a user-initiated permission denial.
+2. **Console Warning**: A warning message will be printed to the DevTools console to inform developers. For example:
+```javascript
+[Intervention] Access to the Geolocation API was blocked because it was initiated by an ad script.
+
+JavaScript stack:
+  at callGeolocation (https://adtech.example/adscript.js:1:24)
+  at loadAds (https://publisher.example/main.js:123:12)
+
+Matched filterset rule:
+  ||adtech.example^
+
 ```
-
-[Where necessary, provide links to longer explanations of the relevant pre-existing concepts and API.
-If there is no suitable external documentation, you might like to provide supplementary information as an appendix in this document, and provide an internal link where appropriate.]
-
-[If this is already specced, link to the relevant section of the spec.]
-
-[If spec work is in progress, link to the PR or draft of the spec.]
-
-[If you have more potential solutions in mind, add ## Potential Solution 2, 3, etc. sections.]
-
-### How this solution would solve the use cases
-
-[If there are a suite of interacting APIs, show how they work together to solve the use cases described.]
-
-#### Use case 1
-
-[Description of the end-user scenario]
-
-```js
-// Sample code demonstrating how to use these APIs to address that scenario.
-```
-
-#### Use case 2
-
-[etc.]
-
-## Detailed design discussion
-
-### [Tricky design choice #1]
-
-[Talk through the tradeoffs in coming to the specific design point you want to make.]
-
-```js
-// Illustrated with example code.
-```
-
-[This may be an open question,
-in which case you should link to any active discussion threads.]
-
-### [Tricky design choice 2]
-
-[etc.]
-
-## Considered alternatives
-
-[This should include as many alternatives as you can,
-from high level architectural decisions down to alternative naming choices.]
-
-### [Alternative 1]
-
-[Describe an alternative which was considered,
-and why you decided against it.]
-
-### [Alternative 2]
-
-[etc.]
+3. **Send Report**: An intervention report will be sent via the **Reporting API** to any registered reporting endpoints for the frame that initiated the call. This allows site owners to monitor the impact of the intervention on their properties. The fields of the report will look similar to the example console warning.
 
 ## Security and Privacy Considerations
 
-[Describe any interesting answers you give to the [Security and Privacy Self-Review
-Questionnaire](https://www.w3.org/TR/security-privacy-questionnaire/) and any interesting ways that
-your feature interacts with [Chromium's Web Platform Security
-Guidelines](https://chromium.googlesource.com/chromium/src/+/master/docs/security/web-platform-security-guidelines.md).]
+The intervention is intended to improve user privacy by limiting access to privacy-sensitive APIs. There are no known privacy or security concerns with this proposal.
 
-## Stakeholder Feedback / Opposition
+---
 
-[Implementors and other stakeholders may already have publicly stated positions on this work. If you can, list them here with links to evidence as appropriate.]
 
-- [Implementor A] : Positive
-- [Stakeholder B] : No signals
-- [Implementor C] : Negative
+### Developer Guidance 💻
 
-[If appropriate, explain the reasons given by other implementors for their concerns.]
+This change will affect ads that attempt to use privacy sensitive APIs for features like location-based offers or interactive experiences.
 
-## References & acknowledgements
 
-[Your design will change and be informed by many people; acknowledge them in an ongoing way! It helps build community and, as we only get by through the contributions of many, is only fair.]
+#### How to Detect the Intervention
 
-[Unless you have a specific reason not to, these should be in alphabetical order.]
 
-Many thanks for valuable feedback and advice from:
 
-- [Person 1]
-- [Person 2]
-- [etc.]
+* **DevTools Console**: The easiest way to check for this intervention during development is to watch for the warning messages in the Chrome DevTools console.
+* **Reporting API**: For production monitoring, site owners should configure a reporting endpoint to receive `intervention` reports. The report body will look similar to this: \
+```javascript
+{
+  "type": "intervention",
+  "age": 60,
+  "url": "https://publisher.example/page",
+  "body": {
+    "id": "AdPrivacySensitiveApi",
+    "message": "Access to the Geolocation API was blocked because it was initiated by an ad script.",
+    "sourceFile": "https://adtech.example/adscript.js",
+    "lineNumber": 1,
+    "columnNumber": 24,
+    "callStack":            ["at callGeolocation(https://adtech.example/adscript.js:1:24)", 
+  "at loadAds (https://publisher.example/main.js:123:12)"],
+    "matchedFiltersetRule": "||adtech.example^",
+    "adAncestry": [],
+  }
+}
+
+```
+
+
+
+
+
+#### Recommended Solution
+
+Functionality requiring sensitive APIs should be **initiated by the publisher's non-ad scripts**.
+
+It’s possible that ads on the page have overridden APIs (such as geolocation) to monitor or track their usage or returned values. In such cases, even if a first-party, non-ad-related script triggered the API call, ad-tech script might still be present on the JavaScript stack at the time of the call. This monitoring code should be removed from your page.
+
+If an ad requires user location, for example, it should communicate that need to the publisher's page script (e.g., via `postMessage`). The page script can then present the user with a permission prompt. If the user consents, the page script can perform the API call and pass the resulting data back to the ad. The key is that the API call itself must not originate from the ad script's stack.
+
+
+---
+
+
+### **Chrome-Specific FAQ**
+
+**1. How does Chrome define an "ad script"?** An ad script is any script whose request URL matches the patterns defined in Chrome’s public ad-blocking [filter list](https://github.com/chromium/chromium-ads-detection) or had an ad script on the JavaScript stack at the time that the script was fetched. This is the same mechanism Chrome uses for its [heavy ads intervention](https://developer.chrome.com/blog/heavy-ad-interventions).
+
+**2. What if an ad's functionality legitimately requires a protected API?** The principle of this intervention is that user consent is granted to the top-level site. The site is responsible for brokering access to these powerful features. The ad should request that the publisher's page initiate the API call, rather than calling it directly.
+
+**3. Will this intervention be enabled by default?** Yes, after a gradual rollout to monitor for breakage and gather feedback.
+
+
