@@ -44,9 +44,7 @@ This intent is to block access to APIs that reveal personal information about th
 
 When the intervention is triggered, Chrome will perform the following three actions simultaneously:
 
-
-
-1. **Deny Permission**: The API request will be automatically denied. For promise-based APIs, the promise will be rejected with a `DOMException` named `'NotAllowedError'`, mimicking a user-initiated permission denial.
+1. **Deny Permission**: The API request will be automatically denied. For promise-based APIs, the promise will be rejected with a `DOMException` named `'NotAllowedError'`.
 2. **Console Warning**: A warning message will be printed to the DevTools console to inform developers. For example:
 ```javascript
 [Intervention] Access to the Geolocation API was blocked because it was initiated by an ad script.
@@ -86,21 +84,14 @@ This change will affect ads that attempt to use privacy sensitive APIs for featu
   "url": "https://publisher.example/page",
   "body": {
     "id": "AdPrivacySensitiveApi",
-    "message": "Access to the Geolocation API was blocked because it was initiated by an ad script.",
+    "message": "Access to the Geolocation API was blocked because it was initiated by an ad script.\nJavaScript stack:\nat callGeolocation (https://adtech.example/adscript.js:1:24)\nat loadAds (https://publisher.example/main.js:123:12)\n\nMatched filterset rule:\n||adtech.example^",
     "sourceFile": "https://adtech.example/adscript.js",
     "lineNumber": 1,
     "columnNumber": 24,
-    "callStack":            ["at callGeolocation(https://adtech.example/adscript.js:1:24)", 
-  "at loadAds (https://publisher.example/main.js:123:12)"],
-    "matchedFiltersetRule": "||adtech.example^",
-    "adAncestry": [],
   }
 }
 
 ```
-
-
-
 
 
 #### Recommended Solution
