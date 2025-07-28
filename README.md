@@ -24,7 +24,7 @@ This intervention will cause the Permissions Policy checks for the given APIs to
 
 #### Ad Classification
 
-The classification of ads is left to the discretion of the user agent. For example, Chrome detects ads using its [AdTagging](https://chromium.googlesource.com/chromium/src/+/master/docs/ad_tagging.md) feature.
+The classification of ads is left to the discretion of the user agent, but the intent is to cover all browsing contexts (e.g., including ad script in the top frame). For example, Chrome detects ads using its [AdTagging](https://chromium.googlesource.com/chromium/src/+/master/docs/ad_tagging.md) feature.
 
 
 #### Protected APIs
