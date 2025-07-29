@@ -61,7 +61,9 @@ Matched filterset rule:
 
 ## Security and Privacy Considerations
 
-The intervention is intended to improve user privacy by limiting access to privacy-sensitive APIs. There are no known privacy or security concerns with this proposal.
+The intervention is intended to improve user privacy by limiting access to privacy-sensitive APIs. 
+
+One known security issue is that a child frame can test whether the browser considers its context to be ad related, by checking for the intervention. That an iframe is considered ad-related means that somewhere in the ancestor chain, the AdTracker considered the script that loaded the frame to be ad-script. This is an pre-existing issue with the other ads interventions in Chrome such as Heavy Ads, and preventing downloads from ads on the web.
 
 ---
 
