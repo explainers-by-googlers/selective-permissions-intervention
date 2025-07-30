@@ -19,7 +19,7 @@ This intervention aims to better align a granted permission with user intent by 
 
 ### The Intervention 🛡️
 
-This intervention will cause the Permissions Policy checks for the given APIs to be denied when the browser determines that an “ad script” attempted to call the API. Here is the [proposed patch](https://github.com/w3c/webappsec-permissions-policy/pull/572) to Permissions Policy.
+This intervention will cause the Permissions Policy checks for the given APIs to be denied when the browser determines that an “ad script” attempted to call the API.
 
 
 #### Ad Classification
@@ -39,7 +39,6 @@ This intent is to block access to APIs that reveal personal information about th
 * Display Capture
 * USB
 
-
 #### Actions Taken
 
 When the intervention is triggered, Chrome will perform the following three actions simultaneously:
@@ -58,6 +57,9 @@ Matched filterset rule:
 
 ```
 3. **Send Report**: An intervention report will be sent via the **Reporting API** to any registered reporting endpoints for the frame that initiated the call. This allows site owners to monitor the impact of the intervention on their properties. The fields of the report will look similar to the example console warning.
+
+#### Proposed Specification
+Here is the [proposed patch](https://github.com/w3c/webappsec-permissions-policy/pull/572) to Permissions Policy.
 
 ## Security and Privacy Considerations
 
