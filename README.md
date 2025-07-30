@@ -19,7 +19,7 @@ This intervention aims to better align a granted permission with user intent by 
 
 ### The Intervention 🛡️
 
-This intervention will cause the Permissions Policy checks for the given APIs to be denied when the browser determines that an “ad script” attempted to call the API.
+This intervention will cause the Permissions Policy checks for the given APIs to be denied when the browser determines that an “ad script” attempted to call the API. Here is the [proposed patch](https://github.com/w3c/webappsec-permissions-policy/pull/572) to Permissions Policy.
 
 
 #### Ad Classification
