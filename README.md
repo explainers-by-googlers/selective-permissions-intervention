@@ -1,7 +1,6 @@
 # Explainer for the Selective Permissions Intervention
 
-This proposal is an early design sketch to describe the problem below and solicit
-feedback on the proposed solution. It has not been approved to ship in Chrome.
+This proposal is shipped in Chrome as of M146.
 
 ## Participate
 - https://github.com/explainers-by-googlers/selective-permissions-intervention/issues
